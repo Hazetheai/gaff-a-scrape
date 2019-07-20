@@ -14,6 +14,9 @@ const util = require("util");
 
 // Dev params
 const postClass = "._1dwg";
+const groupTitle = "#seo_h1_tag";
+const groupTitleOnMobile = "._de1";
+
 // User Modifiable params
 const groups = [
   {
@@ -21,7 +24,7 @@ const groups = [
     url: "https://www.facebook.com/groups/543228419200362"
   },
   {
-    name: "Montreal-Apartments-Roommates-Rooms-for-Rent-and-Sublets",
+    name: "",
     url: "https://www.facebook.com/groups/335425193549035"
   }
 ];
@@ -29,12 +32,12 @@ const numberOfPosts = 100;
 
 /**
  *
- * @param {string} classOrId
+ * @param {string} postClassOrId
  */
 
 // Takes post class or id and returns array of objects with predefined Keys
-function scrapeFbGroupPostsWithPrices(classOrId = "._1dwg") {
-  const posts = Array.from(document.querySelectorAll(classOrId));
+function scrapeFbGroupPostsWithPrices(postClassOrId = "._1dwg") {
+  const posts = Array.from(document.querySelectorAll(postClassOrId));
   const postsArr = posts.map(el => el.innerText);
   return postsArr
     .map(el => el.split("\n").filter(item => item.length > 0))
@@ -54,12 +57,27 @@ function scrapeFbGroupPostsWithPrices(classOrId = "._1dwg") {
 
 /**
  *
+ * @param {string} titleClassOrId
+ * @param {() => void} page
+
+ */
+
+async function getGroupTitle(page, titleClassOrId = "#seo_h1_tag") {
+  return page.evaluate(() =>
+    document
+      .querySelector("#seo_h1_tag")
+      .innerText.replace(/,\s|\s/gi, "-")
+      .toLowerCase()
+  );
+}
+
+/**
+ *
  * @param {() => void} page
  * @param {function} scrapeFunc
  * @param {number} itemTargetCount
  * @param {number} scrollDelay
  *
- * @returns {Object[]}
  */
 // Scrapes an infinite scroll page for a user specified number of posts at a predefined delay(So that pages loads content)
 async function scrapeInfiniteScroll(
@@ -72,6 +90,7 @@ async function scrapeInfiniteScroll(
 
   try {
     let previousHeight;
+
     while (items.length < itemTargetCount) {
       items = await page.evaluate(scrapeFunc);
       previousHeight = await page.evaluate("document.body.scrollHeight");
@@ -89,9 +108,9 @@ async function scrapeInfiniteScroll(
 
 /**
  *
- * @param {{a: string, b: string}} target
- * @param {string} target[].name
- * @param {string} target[].url
+ * @param {{name: string, url: string}} target
+ * @param {string} [target.name]
+ * @param {string} target.url
  */
 
 async function executeScript(target) {
@@ -104,6 +123,18 @@ async function executeScript(target) {
   page.setViewport({ width: 1280, height: 980 });
 
   await page.goto(target.url);
+
+  //   Clean namestrings and make into kebab-case
+  const scrapedTitle = await getGroupTitle(page, groupTitle);
+  console.log("scrapedTitle", scrapedTitle);
+
+  if (target.name.length === 0) {
+    target.name = scrapedTitle;
+    if (scrapedTitle === undefined)
+      target.name = target.url.substring(12).replace(/\/|.com/gi, "-");
+  } else target.name.replace(/,\s|\s/gi, "-").toLowerCase();
+
+  console.log("target.name", target.name);
   const items = await scrapeInfiniteScroll(
     page,
     scrapeFbGroupPostsWithPrices,
@@ -119,7 +150,6 @@ async function executeScript(target) {
   console.log("result", items.length);
   await browser.close();
 }
-
 for (target of groups) {
   executeScript(target);
 }
