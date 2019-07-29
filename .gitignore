@@ -3,5 +3,6 @@ node_modules
 .DS_Store
 log*
 *log
-
+pdf2json/json
+pdf2json/pdf
 data
