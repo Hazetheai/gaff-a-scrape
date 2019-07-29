@@ -1,6 +1,5 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
-const util = require("util");
 
 //          ------ Info I want to be able to pass as a User------
 //  ==> Input Parameters
@@ -18,16 +17,16 @@ const groupTitle = "#seo_h1_tag";
 const groupTitleOnMobile = "._de1";
 
 // User Modifiable params
-const groups = [
-  {
-    name: "logements-a-louer-montreal",
-    url: "https://www.facebook.com/groups/543228419200362"
-  },
-  {
-    name: "",
-    url: "https://www.facebook.com/groups/335425193549035"
-  }
-];
+// const groups = [
+//   {
+//     name: "logements-a-louer-montreal",
+//     url: "https://www.facebook.com/groups/543228419200362"
+//   },
+//   {
+//     name: "",
+//     url: "https://www.facebook.com/groups/335425193549035"
+//   }
+// ];
 const numberOfPosts = 100;
 
 /**
@@ -150,6 +149,16 @@ async function executeScript(target) {
   console.log("result", items.length);
   await browser.close();
 }
-for (target of groups) {
-  executeScript(target);
-}
+
+/**
+ *
+ * @param {Array.<Object>} groups
+ */
+
+const inputGroups = groups => {
+  for (target of groups) {
+    executeScript(target);
+  }
+};
+
+module.exports = { inputGroups };
