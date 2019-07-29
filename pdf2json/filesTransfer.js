@@ -1,12 +1,15 @@
 const fs = require("fs");
 // const selectedPage = require(`${desiredPage}.json`);
 
+// Refactor into pipes and transform streams
+
 /**
  *
- * @param {string} fullDump Name of full pdf document you are parsing
+ * @param {string} fullDump Name of full json file you are parsing
  * @param {string} desiredPage Name of the file that will contain json for your desired page
+ * @param {number} pageNumber Number of the page you want to extract from
  */
-function getDesiredPage(fullDump, desiredPage) {
+function getDesiredPage(fullDump, desiredPage, pageNumber) {
   const inputPages = fs.createReadStream(
     __dirname + `/json/raw/${fullDump}.json`,
     "utf-8"
@@ -17,7 +20,7 @@ function getDesiredPage(fullDump, desiredPage) {
 
   inputPages.on("data", chunk => {
     outputPage.write(
-      JSON.stringify(JSON.parse(chunk).formImage.Pages[1].Texts)
+      JSON.stringify(JSON.parse(chunk).formImage.Pages[pageNumber - 1].Texts)
     );
   });
   console.log(desiredPage);
@@ -29,13 +32,13 @@ function getDesiredPage(fullDump, desiredPage) {
  * @param {Array} selectedPage Array of values to strip cc vals & names from
  */
 
-function getCCValues(selectedPage) {
-  for (i = 0; i < selectedPage.length; i++) {
-    console.log(selectedPage[i].R[0].T);
-  }
-}
+// function getCCValues(selectedPage) {
+//   for (i = 0; i < selectedPage.length; i++) {
+//     console.log(selectedPage[i].R[0].T);
+//   }
+// }
 
-// getDesiredPage("se-02", "page1");
+getDesiredPage("se-02", "page1", 2);
 
 function getCCValues(page) {
   const desiredPage = require(__dirname + `/json/trimmed/${page}.json`);
@@ -45,4 +48,4 @@ function getCCValues(page) {
   }
 }
 
-getCCValues("page1");
+// getCCValues("page1");
