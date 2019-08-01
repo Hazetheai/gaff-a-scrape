@@ -17,16 +17,16 @@ const groupTitle = "#seo_h1_tag";
 const groupTitleOnMobile = "._de1";
 
 // User Modifiable params
-// const groups = [
-//   {
-//     name: "logements-a-louer-montreal",
-//     url: "https://www.facebook.com/groups/543228419200362"
-//   },
-//   {
-//     name: "",
-//     url: "https://www.facebook.com/groups/335425193549035"
-//   }
-// ];
+const groups = [
+  {
+    name: "logements-a-louer-montreal",
+    url: "https://www.facebook.com/groups/543228419200362"
+  },
+  {
+    name: "",
+    url: "https://www.facebook.com/groups/335425193549035"
+  }
+];
 const numberOfPosts = 100;
 
 /**
@@ -125,7 +125,7 @@ async function executeScript(target) {
 
   //   Clean namestrings and make into kebab-case
   const scrapedTitle = await getGroupTitle(page, groupTitle);
-  console.log("scrapedTitle", scrapedTitle);
+  // console.log("scrapedTitle", scrapedTitle);
 
   if (target.name.length === 0) {
     target.name = scrapedTitle;
@@ -133,7 +133,7 @@ async function executeScript(target) {
       target.name = target.url.substring(12).replace(/\/|.com/gi, "-");
   } else target.name.replace(/,\s|\s/gi, "-").toLowerCase();
 
-  console.log("target.name", target.name);
+  // console.log("target.name", target.name);
   const items = await scrapeInfiniteScroll(
     page,
     scrapeFbGroupPostsWithPrices,
@@ -155,10 +155,11 @@ async function executeScript(target) {
  * @param {Array.<Object>} groups
  */
 
-const inputGroups = groups => {
+const scrapeGroups = async groups => {
   for (target of groups) {
-    executeScript(target);
+    await executeScript(target);
   }
 };
+// scrapeGroups(groups);
 
-module.exports = { inputGroups };
+module.exports = { scrapeGroups };
