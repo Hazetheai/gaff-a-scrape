@@ -1,4 +1,4 @@
-const { inputGroups } = require("./pupScrapeV2");
+const { scrapeGroups } = require("./pupScrapeV2");
 const { Transform } = require("stream");
 const fs = require("fs");
 
@@ -12,8 +12,6 @@ const groups = [
     url: "https://www.facebook.com/groups/335425193549035"
   }
 ];
-
-// inputGroups(groups);
 
 class FilterKeywords extends Transform {
   //   constructor(poster, timeElapsed, postTitle, price, location, text) {
@@ -32,7 +30,6 @@ class FilterKeywords extends Transform {
       JSON.parse(chunk).filter(el => {
         const re = new RegExp(this.location, "gi");
         if (el.location) {
-          console.log("el", el.location);
           return el.location.match(re);
         } else return false;
       })
@@ -46,6 +43,11 @@ class FilterKeywords extends Transform {
     callback();
   }
 }
+/**
+ *
+ * @param {string} inputFile input Filename
+ * @param {string} outputFile output Filename
+ */
 
 function getSearchResults(inputFile, outputFile = inputFile) {
   const inp = fs.createReadStream(
@@ -57,8 +59,18 @@ function getSearchResults(inputFile, outputFile = inputFile) {
   );
 
   inp.pipe(mySearch).pipe(out);
+  console.log("searched");
 }
 
 let mySearch = new FilterKeywords("plateau");
 
-getSearchResults("logements-a-louer-montreal");
+// (async () => {
+//   scrapeGroups(groups).then(done => {
+//     if (done) console.log("promise done");
+//   });
+
+//   await getSearchResults("logements-a-louer-montreal");
+//   console.log("Donezo");
+// })();
+
+scrapeGroups(groups).then(() => getSearchResults("logements-a-louer-montreal"));
