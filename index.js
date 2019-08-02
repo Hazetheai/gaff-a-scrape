@@ -49,7 +49,7 @@ class FilterKeywords extends Transform {
  * @param {string} outputFile output Filename
  */
 
-function getSearchResults(inputFile, outputFile = inputFile) {
+async function getSearchResults(inputFile, outputFile = inputFile) {
   const inp = fs.createReadStream(
     __dirname + `/data/${inputFile}.json`,
     "utf-8"
@@ -64,13 +64,8 @@ function getSearchResults(inputFile, outputFile = inputFile) {
 
 let mySearch = new FilterKeywords("plateau");
 
-// (async () => {
-//   scrapeGroups(groups).then(done => {
-//     if (done) console.log("promise done");
-//   });
-
-//   await getSearchResults("logements-a-louer-montreal");
-//   console.log("Donezo");
-// })();
-
-scrapeGroups(groups).then(() => getSearchResults("logements-a-louer-montreal"));
+scrapeGroups(groups).then(() =>
+  getSearchResults("logements-a-louer-montreal").then(
+    getSearchResults("montreal-apartments-roommates-rooms-for-rent-and-sublets")
+  )
+);
