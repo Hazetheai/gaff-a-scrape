@@ -42,6 +42,9 @@ function scrapeFbGroupPostsWithPrices(postClassOrId = "._1dwg") {
     .map(el => el.split("\n").filter(item => item.length > 0))
     .map(elem => {
       return {
+        scrapedTimestamp: Date.now(),
+        // postedTimestamp: posts[x].querySelector('[data-shorten="1"]').dataset.utime,
+        groupName: posts[0].ownerDocument.title,
         poster: elem[0],
         timeElapsed: elem[1],
         postTitle: elem[2],
