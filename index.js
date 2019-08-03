@@ -64,8 +64,4 @@ async function getSearchResults(inputFile, outputFile = inputFile) {
 
 let mySearch = new FilterKeywords("plateau");
 
-scrapeGroups(groups).then(() =>
-  getSearchResults("logements-a-louer-montreal").then(
-    getSearchResults("montreal-apartments-roommates-rooms-for-rent-and-sublets")
-  )
-);
+scrapeGroups(groups).then(() => getSearchResults("logements-a-louer-montreal"));
