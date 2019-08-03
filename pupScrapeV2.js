@@ -29,6 +29,14 @@ const groups = [
 ];
 const numberOfPosts = 100;
 
+// let bnn = postsArr.map((el, idx) => {
+
+//   let b;
+//   b = el.split('\n')
+//   b.push(idx)
+//   return b;
+//   })
+
 /**
  *
  * @param {string} postClassOrId
@@ -38,23 +46,31 @@ const numberOfPosts = 100;
 function scrapeFbGroupPostsWithPrices(postClassOrId = "._1dwg") {
   const posts = Array.from(document.querySelectorAll(postClassOrId));
   const postsArr = posts.map(el => el.innerText);
-  return postsArr
-    .map(el => el.split("\n").filter(item => item.length > 0))
-    .map(elem => {
-      return {
-        scrapedTimestamp: Date.now(),
-        // postedTimestamp: posts[x].querySelector('[data-shorten="1"]').dataset.utime,
-        groupName: posts[0].ownerDocument.title,
-        poster: elem[0],
-        timeElapsed: elem[1],
-        postTitle: elem[2],
-        price: elem[3],
-        location: elem[4],
-        text: elem.slice(4).reduce((acc, currVal) => {
-          return acc.concat(currVal);
-        }, [])
-      };
-    });
+  const filteredArr = postsArr.map((el, idx) => {
+    let b;
+    b = el.split("\n");
+    b.push(idx);
+    return b.filter(el => el.length > 0);
+  });
+
+  return filteredArr.map(elem => {
+    return {
+      poster: elem[0],
+      index: elem[elem.length - 1],
+      timeElapsed: elem[1],
+      postTitle: elem[2],
+      price: elem[3],
+      location: elem[4],
+      scrapedTimestamp: Math.floor(Date.now() / 1000),
+      groupName: posts[elem.length - 1].ownerDocument.title,
+      postedTimestamp: parseInt(
+        posts[elem.length - 1].querySelector('[data-shorten="1"]').dataset.utime
+      ),
+      text: elem.slice(7).reduce((acc, currVal) => {
+        return acc.concat(currVal);
+      }, [])
+    };
+  });
 }
 
 /**
