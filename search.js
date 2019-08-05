@@ -1,6 +1,5 @@
 const { Transform } = require("stream");
 const fs = require("fs");
-const { groups } = require("./groupsToScrape");
 
 class FilterKeywords extends Transform {
   //   constructor(poster, timeElapsed, postTitle, price, location, text) {
@@ -29,14 +28,14 @@ class FilterKeywords extends Transform {
       })
     );
     this.push(filterChunk);
-    callback();
   }
 
-  // _flush(callback) {
-  //   this.push("");
-  //   callback();
-  // }
+  _flush(callback) {
+    this.push("");
+    callback();
+  }
 }
+
 /**
  *
  * @param {string} inputFile input Filename
@@ -56,9 +55,79 @@ function getSearchResults(inputFile, outputFile = inputFile) {
   console.log("searched");
 }
 
-let mySearch = new FilterKeywords("e");
+let mySearch = new FilterKeywords("plateau");
+// getSearchResults("logements-a-louer-montreal");
+// module.exports = { getSearchResults };
 
-getSearchResults("logements-a-louer-montreal");
-// getSearchResults("mtl-apts");
+const cron = require("node-cron");
 
-module.exports = getSearchResults;
+cron.schedule("* */4 * * *", () => {
+  console.log("Searching");
+  getSearchResults("logements-a-louer-montreal");
+});
+
+/**
+ * class FilterKeywords extends Transform {
+  /**
+   *
+   * @param {string} poster
+   * @param {string} timeElapsed
+   * @param {string} postTitle
+   * @param {string} price
+   * @param {string} location
+   * @param {string} text
+   */
+
+/*
+  constructor(
+    poster = "",
+    timeElapsed = "",
+    postTitle = "",
+    price = "",
+    location = "",
+    text = ""
+  ) {
+    super();
+    this.poster = poster;
+    this.timeElapsed = timeElapsed;
+    this.postTitle = postTitle;
+    this.price = price;
+    this.location = location;
+    this.text = text;
+  }
+
+  _transform(chunk, encoding, callback) {
+    const filterChunk = JSON.stringify(
+      JSON.parse(chunk).filter(el => {
+        const poster = new RegExp(this.location, "gi");
+        const timeEl = new RegExp(this.location, "gi");
+        const title = new RegExp(this.location, "gi");
+        const loc = new RegExp(this.location, "gi");
+        const txt = new RegExp(this.location, "gi");
+
+        if (el.poster.length > 0) {
+          return el.poster.match(poster);
+        }
+        if (el.timeElapsed.length > 0) {
+          return el.timeEl.match(timeEl);
+        }
+        if (el.postTitle.length > 0) {
+          return el.title.match(title);
+        }
+        if (el.location.length > 0) {
+          return el.location.match(loc);
+        }
+        if (el.text.length > 0) {
+          return el.location.match(txt);
+        }
+      })
+    );
+    this.push(filterChunk);
+  }
+
+  _flush(callback) {
+    this.push("");
+    callback();
+  }
+}
+ */
