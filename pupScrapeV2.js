@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
+const { groups } = require("./groupsToScrape");
 
 //          ------ Info I want to be able to pass as a User------
 //  ==> Input Parameters
@@ -16,26 +17,7 @@ const postClass = "._1dwg";
 const groupTitle = "#seo_h1_tag";
 const groupTitleOnMobile = "._de1";
 
-// User Modifiable params
-const groups = [
-  {
-    name: "logements-a-louer-montreal",
-    url: "https://www.facebook.com/groups/543228419200362"
-  },
-  {
-    name: "",
-    url: "https://www.facebook.com/groups/335425193549035"
-  }
-];
-const numberOfPosts = 100;
-
-// let bnn = postsArr.map((el, idx) => {
-
-//   let b;
-//   b = el.split('\n')
-//   b.push(idx)
-//   return b;
-//   })
+const numberOfPosts = 20;
 
 /**
  *
@@ -44,29 +26,30 @@ const numberOfPosts = 100;
 
 // Takes post class or id and returns array of objects with predefined Keys
 function scrapeFbGroupPostsWithPrices(postClassOrId = "._1dwg") {
-  const posts = Array.from(document.querySelectorAll(postClassOrId));
+  const posts = Array.from(document.querySelectorAll("._1dwg"));
   const postsArr = posts.map(el => el.innerText);
   const filteredArr = postsArr.map((el, idx) => {
     let b;
-    b = el.split("\n");
-    b.push(idx);
-    return b.filter(el => el.length > 0);
+    b = el.split("\n").filter(el => el.length > 0);
+    b.unshift(idx);
+    return b;
   });
 
   return filteredArr.map(elem => {
     return {
-      poster: elem[0],
-      index: elem[elem.length - 1],
-      timeElapsed: elem[1],
-      postTitle: elem[2],
-      price: elem[3],
-      location: elem[4],
-      scrapedTimestamp: Math.floor(Date.now() / 1000),
+      poster: elem[1],
       groupName: posts[elem.length - 1].ownerDocument.title,
+      timeElapsed: elem[2],
+      postTitle: elem[3],
+      price: elem[4],
+      location: elem[5],
+      url: posts[elem[0]].querySelector(".fsm.fwn.fcg").children[0].href,
+      index: elem[0],
+      scrapedTimestamp: Math.floor(Date.now() / 1000),
       postedTimestamp: parseInt(
-        posts[elem.length - 1].querySelector('[data-shorten="1"]').dataset.utime
+        posts[elem[0]].querySelector('[data-shorten="1"]').dataset.utime
       ),
-      text: elem.slice(7).reduce((acc, currVal) => {
+      text: elem.slice(5).reduce((acc, currVal) => {
         return acc.concat(currVal);
       }, [])
     };
@@ -144,13 +127,12 @@ async function executeScript(target) {
 
   //   Clean namestrings and make into kebab-case
   const scrapedTitle = await getGroupTitle(page, groupTitle);
-  // console.log("scrapedTitle", scrapedTitle);
 
   if (target.name.length === 0) {
     target.name = scrapedTitle;
     if (scrapedTitle === undefined)
       target.name = target.url.substring(12).replace(/\/|.com/gi, "-");
-  } else target.name.replace(/,\s|\s/gi, "-").toLowerCase();
+  } else target.name = target.name.replace(/,\s|\s/gi, "-").toLowerCase();
 
   // console.log("target.name", target.name);
   const items = await scrapeInfiniteScroll(
@@ -158,9 +140,8 @@ async function executeScript(target) {
     scrapeFbGroupPostsWithPrices,
     numberOfPosts
   );
-
   fs.writeFileSync(
-    `./data/${target.name}.json`,
+    `${__dirname}/data/${target.name}.json`,
     JSON.stringify(items),
     "utf-8"
   );
@@ -179,6 +160,6 @@ const scrapeGroups = async groups => {
     await executeScript(target);
   }
 };
-// scrapeGroups(groups);
+scrapeGroups(groups);
 
 module.exports = { scrapeGroups };
