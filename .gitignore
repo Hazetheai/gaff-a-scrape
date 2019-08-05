@@ -6,3 +6,4 @@ log*
 pdf2json/json
 pdf2json/pdf
 data
+config/keys.js
