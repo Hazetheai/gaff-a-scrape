@@ -17,7 +17,7 @@ const postClass = "._1dwg";
 const groupTitle = "#seo_h1_tag";
 const groupTitleOnMobile = "._de1";
 
-const numberOfPosts = 20;
+const numberOfPosts = 80;
 
 /**
  *
@@ -160,6 +160,6 @@ const scrapeGroups = async groups => {
     await executeScript(target);
   }
 };
-scrapeGroups(groups);
+// scrapeGroups(groups);
 
 module.exports = { scrapeGroups };
