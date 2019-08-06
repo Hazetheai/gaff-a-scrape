@@ -26,7 +26,7 @@ const numberOfPosts = 80;
 
 // Takes post class or id and returns array of objects with predefined Keys
 function scrapeFbGroupPostsWithPrices(postClassOrId = "._1dwg") {
-  const posts = Array.from(document.querySelectorAll("._1dwg"));
+  const posts = Array.from(document.querySelectorAll(postClassOrId));
   const postsArr = posts.map(el => el.innerText);
   const filteredArr = postsArr.map((el, idx) => {
     let b;

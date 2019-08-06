@@ -61,7 +61,7 @@ const sendEmail = () => {
   });
 };
 
-sendEmail();
+// sendEmail();
 
 module.exports = {
   sendEmail
