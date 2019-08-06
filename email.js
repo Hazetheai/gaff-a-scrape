@@ -1,16 +1,6 @@
 const nodemailer = require("nodemailer");
 const { emailLogin, emailPassword } = require("./config/keys");
 const fs = require("fs");
-const data = fs.readFileSync(
-  `${__dirname}/data/search_results/logements-a-louer-montreal.json`,
-  "utf8",
-  (err, data) => {
-    if (err) throw err;
-    else {
-      return data;
-    }
-  }
-);
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -20,25 +10,47 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const pretty = JSON.parse(data).map(el => {
-  return `
-  <ul class="list">
-    <li>poster : ${el.poster}</li>
-    <li>groupName : ${el.groupName}</li>
-    <li>timeElapsed: ${el.timeElapsed}</li>
-    <li>postTitle: ${el.postTitle}</li>
-    <li>price : ${el.price}</li>
-    <li>location : ${el.location}</li>
-    <li>url : ${el.url}</li>
-    <li>index : ${el.index}</li>
-    <li>scrapedTimestamp : ${el.scrapedTimestamp}</li>
-    <li>postedTimestamp : ${el.postedTimestamp}</li>
-    <li>text : ${el.postedTimestamp}</li> 
-  </ul>
-  `;
-});
+/**
+ *
+ * @param {String[]} args Files to be included in email
+ */
+function printJson(args) {
+  return [...args].forEach(el => {
+    let data = JSON.parse(
+      fs.readFileSync(
+        `${__dirname}/data/search_results/${el}.json`,
+        "utf8",
+        (err, data) => {
+          if (err) throw err;
+          else {
+            return data;
+          }
+        }
+      )
+    );
+    // console.log("fiiiiillelele", data[0].poster);
+    setTimeout(() => console.log("waiting"), 200);
+    return data.map(
+      el => `
+    <ul class="list">
+      <li>poster : ${el.poster}</li>
+      <li>groupName : ${el.groupName}</li>
+      <li>timeElapsed: ${el.timeElapsed}</li>
+      <li>postTitle: ${el.postTitle}</li>
+      <li>price : ${el.price}</li>
+      <li>location : ${el.location}</li>
+      <li>url : ${el.url}</li>
+      <li>index : ${el.index}</li>
+      <li>scrapedTimestamp : ${el.scrapedTimestamp}</li>
+      <li>postedTimestamp : ${el.postedTimestamp}</li>
+      <li>text : ${el.postedTimestamp}</li> 
+    </ul>
+    `
+    );
+  });
+}
 
-console.log("pretty", pretty);
+console.log("pretty", printJson(["mtl-apts"]));
 
 const mailOptions = {
   from: emailLogin,
@@ -46,7 +58,8 @@ const mailOptions = {
   subject: "🌻 Scraped Gaffs! 🌻",
   html: `
 
-  ${pretty}
+
+  ${printJson(["mtl-apts"])}
 
     <p>–Your friends at Gaff-a-Scrape</p>
       `
