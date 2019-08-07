@@ -15,8 +15,8 @@ const transporter = nodemailer.createTransport({
  * @param {String[]} args Files to be included in email
  */
 function printJson(args) {
-  return [...args].forEach(el => {
-    let data = JSON.parse(
+  let filesArr = [...args].map(el => {
+    return JSON.parse(
       fs.readFileSync(
         `${__dirname}/data/search_results/${el}.json`,
         "utf8",
@@ -28,29 +28,40 @@ function printJson(args) {
         }
       )
     );
-    // console.log("fiiiiillelele", data[0].poster);
-    setTimeout(() => console.log("waiting"), 200);
-    return data.map(
-      el => `
+  });
+  return filesArr.map(elem => {
+    return elem.map(el => {
+      if (el == undefined) return "No Post Info";
+
+      return `
     <ul class="list">
-      <li>poster : ${el.poster}</li>
-      <li>groupName : ${el.groupName}</li>
-      <li>timeElapsed: ${el.timeElapsed}</li>
-      <li>postTitle: ${el.postTitle}</li>
-      <li>price : ${el.price}</li>
-      <li>location : ${el.location}</li>
-      <li>url : ${el.url}</li>
-      <li>index : ${el.index}</li>
-      <li>scrapedTimestamp : ${el.scrapedTimestamp}</li>
-      <li>postedTimestamp : ${el.postedTimestamp}</li>
-      <li>text : ${el.postedTimestamp}</li> 
+    <li>poster : ${el.poster || el.index}</li>
+    
+    <li>groupName : ${el.groupName || el.index}</li>
+    
+    <li>timeElapsed: ${el.timeElapsed || el.index}</li>
+    
+    <li>postTitle: ${el.postTitle || el.index}</li>
+    
+    <li>price : ${el.price || el.index}</li>
+    
+    <li>location : ${el.location || el.index}</li>
+    
+    <li>url : ${el.url || el.index}</li>
+    
+    <li>index : ${el.index}</li>
+    
+    <li>scrapedTimestamp : ${el.scrapedTimestamp || el.index}</li>
+    
+    <li>postedTimestamp : ${el.postedTimestamp || el.index}</li>
+    
+    <li>text : ${el.postedTimestamp || el.index}</li>
+    
     </ul>
-    `
-    );
+    `;
+    });
   });
 }
-
-console.log("pretty", printJson(["mtl-apts"]));
 
 const mailOptions = {
   from: emailLogin,
@@ -58,8 +69,7 @@ const mailOptions = {
   subject: "🌻 Scraped Gaffs! 🌻",
   html: `
 
-
-  ${printJson(["mtl-apts"])}
+  ${printJson(["mtl-apts", "logements-a-louer-montreal"])}
 
     <p>–Your friends at Gaff-a-Scrape</p>
       `
