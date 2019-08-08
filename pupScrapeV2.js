@@ -26,7 +26,7 @@ const numberOfPosts = 80;
 
 // Takes post class or id and returns array of objects with predefined Keys
 function scrapeFbGroupPostsWithPrices(postClassOrId = "._1dwg") {
-  const posts = Array.from(document.querySelectorAll(postClassOrId));
+  const posts = Array.from(document.querySelectorAll("._1dwg"));
   const postsArr = posts.map(el => el.innerText);
   const filteredArr = postsArr.map((el, idx) => {
     let b;
@@ -141,7 +141,7 @@ async function executeScript(target) {
     numberOfPosts
   );
   fs.writeFileSync(
-    `${__dirname}/data/${target.name}.json`,
+    `${__dirname}/data/scraped/${target.name}.json`,
     JSON.stringify(items),
     "utf-8"
   );
@@ -160,6 +160,6 @@ const scrapeGroups = async groups => {
     await executeScript(target);
   }
 };
-// scrapeGroups(groups);
+scrapeGroups(groups);
 
 module.exports = { scrapeGroups };
