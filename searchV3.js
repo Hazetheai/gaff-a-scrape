@@ -2,7 +2,6 @@ const { Transform } = require("stream");
 const fs = require("fs");
 const JSONStream = require("JSONStream");
 const parser = JSONStream.parse("*");
-const stringer = JSONStream.stringify("*");
 
 class FilterKeywords extends Transform {
   /**
@@ -22,16 +21,6 @@ class FilterKeywords extends Transform {
   _transform(chunk, encoding, next) {
     const re = new RegExp(this.keyword, "gi");
     if (this.keyword.length === 0) return;
-
-    // console.log(
-    //   "agdhab",
-    //   Object.values(chunk).filter(el => {
-    //     if (el.post.poster == this.keyword) {
-    //       return el.post;
-    //     }
-    //   })
-    // );
-    console.log("Object.values(chunk)", Object.values(chunk)[0].post.poster);
     let filterChunk = Object.values(chunk).filter(el => {
       if (!this.heading) {
         return JSON.stringify(el.post).match(re);
@@ -39,7 +28,6 @@ class FilterKeywords extends Transform {
         return el.post.postTitle.match(re);
       } else return false;
     });
-    console.log("filterChunk", filterChunk);
     this.push(JSON.stringify(filterChunk));
   }
 
@@ -48,11 +36,6 @@ class FilterKeywords extends Transform {
   //   callback();
   // }
 }
-
-/**
- *
- * @param {string} args Database Name
- */
 
 function getSearchResults() {
   let inp = fs.createReadStream(__dirname + `/data/db/db.json`, "utf-8");
@@ -68,5 +51,7 @@ function getSearchResults() {
   console.log("searched");
 }
 
-let mySearch = new FilterKeywords("3 1/2", "");
+let mySearch = new FilterKeywords("MUTEK", "");
 getSearchResults();
+
+module.exports = getSearchResults;
