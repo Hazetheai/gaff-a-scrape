@@ -17,8 +17,7 @@ const postClass = "._1dwg";
 const groupTitle = "#seo_h1_tag";
 const groupTitleOnMobile = "._de1";
 
-const numberOfPosts = 80;
-
+const numberOfPosts = 60;
 /**
  *
  * @param {string} postClassOrId
@@ -45,10 +44,11 @@ function scrapeFbGroupPostsWithPrices(postClassOrId = "._1dwg") {
       location: elem[5],
       url: posts[elem[0]].querySelector(".fsm.fwn.fcg").children[0].href,
       index: elem[0],
-      scrapedTimestamp: Math.floor(Date.now() / 1000),
-      postedTimestamp: parseInt(
-        posts[elem[0]].querySelector('[data-shorten="1"]').dataset.utime
-      ),
+      scrapedTimestamp: Date.now(),
+      postedTimestamp:
+        parseInt(
+          posts[elem[0]].querySelector('[data-shorten="1"]').dataset.utime
+        ) * 1000,
       text: elem.slice(5).reduce((acc, currVal) => {
         return acc.concat(currVal);
       }, [])
@@ -84,7 +84,7 @@ async function getGroupTitle(page, titleClassOrId = "#seo_h1_tag") {
 async function scrapeInfiniteScroll(
   page,
   scrapeFunc = scrapeFbGroupPostsWithPrices,
-  itemTargetCount = 100,
+  itemTargetCount = 60,
   scrollDelay = 1000
 ) {
   let items = [];
@@ -123,7 +123,7 @@ async function executeScript(target) {
   const page = await browser.newPage();
   page.setViewport({ width: 1280, height: 980 });
 
-  await page.goto(target.url);
+  await page.goto(target.url, { timeout: 0 });
 
   //   Clean namestrings and make into kebab-case
   const scrapedTitle = await getGroupTitle(page, groupTitle);
@@ -155,9 +155,9 @@ async function executeScript(target) {
  * @param {Array.<Object>} groups
  */
 
-const scrapeGroups = async groups => {
+const scrapeGroups = groups => {
   for (target of groups) {
-    await executeScript(target);
+    executeScript(target);
   }
 };
 scrapeGroups(groups);
