@@ -4,15 +4,18 @@ const adapter = new FileSync("./data/db/db.json");
 const db = low(adapter);
 const fs = require("fs");
 const path = require("path");
+const cron = require("node-cron");
 
 // Get Filenames
 const directoryPath = path.join(__dirname, "data/scraped");
-fs.readdir(directoryPath, function(err, files) {
-  if (err) {
-    return console.log("Unable to scan directory: " + err);
-  }
-  printJson(files);
-});
+const updateDB = () => {
+  fs.readdir(directoryPath, function(err, files) {
+    if (err) {
+      return console.log("Unable to scan directory: " + err);
+    }
+    printJson(files);
+  });
+};
 
 // Pass contents to db Func
 /**
@@ -57,3 +60,12 @@ function printJson(args) {
 db.defaults({ posts: [], user: {}, count: 0 }).write();
 
 db.set("user.name", "jakeriordan").write();
+
+// module.exports = updateDB;
+
+// cron.schedule("15 3 * * *", () => {
+//   console.log("Populating DB");
+updateDB();
+
+//   console.log("Populated DB");
+// });

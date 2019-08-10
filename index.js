@@ -3,4 +3,4 @@ const { scrapeGroups } = require("./pupScrapeV2");
 const { groups } = require("./groupsToScrape");
 const cron = require("node-cron");
 
-getSearchResults("logements-a-louer-montreal");
+getSearchResults(["mtl-apts"]);

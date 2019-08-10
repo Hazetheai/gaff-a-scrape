@@ -69,7 +69,7 @@ const mailOptions = {
   subject: "🌻 Scraped Gaffs! 🌻",
   html: `
 
-  ${printJson(["mtl-apts", "logements-a-louer-montreal"])}
+  ${printJson(["logements-a-louer-montreal", "mtl-apts"])}
 
     <p>–Your friends at Gaff-a-Scrape</p>
       `
@@ -84,7 +84,7 @@ const sendEmail = () => {
   });
 };
 
-// sendEmail();
+sendEmail();
 
 module.exports = {
   sendEmail
