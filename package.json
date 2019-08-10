@@ -10,6 +10,7 @@
   "author": "Jake Riordan",
   "license": "MIT",
   "dependencies": {
+    "JSONStream": "^1.3.5",
     "cheerio": "^1.0.0-rc.3",
     "cli-table": "^0.3.1",
     "cron": "^1.7.1",
