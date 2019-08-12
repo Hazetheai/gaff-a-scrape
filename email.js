@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 const { emailLogin, emailPassword } = require("./config/keys");
 const fs = require("fs");
+const cron = require("node-cron");
 
 const timezone = "en-US";
 
@@ -11,6 +12,12 @@ const transporter = nodemailer.createTransport({
     pass: emailPassword
   }
 });
+
+function getLocalTime(timezone, timestamp) {
+  const date = new Date(timestamp).toLocaleDateString(timezone);
+  const time = new Date(timestamp).toLocaleTimeString(timezone);
+  return `${date} at ${time}`;
+}
 
 function printJson() {
   const file = JSON.parse(
@@ -31,46 +38,40 @@ function printJson() {
    * @param {string} timezone Local timezone
    * @param {number} timestamp unix timestamp
    */
-  function getLocalTime(timezone, timestamp) {
-    const date = new Date(timestamp).toLocaleDateString(timezone);
-    const time = new Date(timestamp).toLocaleTimeString(timezone);
-    return `${date} at ${time}`;
-  }
 
   // console.log("file", file);
 
-  return file.map(el => {
-    if (el.post == undefined) return "No Post Info";
+  return file
+    .sort((a, b) => b.id - a.id)
+    .slice(0, 14)
+    .map(el => {
+      if (el.post == undefined) return "No Post Info";
 
-    return `
+      return `
     <ul class="list">
-    <li>poster : ${el.post.poster || el.post.index}</li>
+    <li>Poster : ${el.post.poster || el.post.index}</li>
     
-    <li>groupName : ${el.post.groupName || el.post.index}</li>
+    <li>Group Name : ${el.post.groupName || el.post.index}</li>
+        
+    <li>Post Title: ${el.post.postTitle || el.post.index}</li>
     
-    <li>timeElapsed: ${el.post.timeElapsed || el.post.index}</li>
+    <li>Price : ${el.post.price || ""}</li>
     
-    <li>postTitle: ${el.post.postTitle || el.post.index}</li>
+    <li>Location : ${el.post.location || ""}</li>
     
-    <li>price : ${el.post.price || el.post.index}</li>
-    
-    <li>location : ${el.post.location || el.post.index}</li>
-    
-    <li>url : ${el.post.url || el.post.index}</li>
-    
-    <li>index : ${el.post.index}</li>
-    
-    <li>scrapedTimestamp : ${getLocalTime(timezone, el.post.scrapedTimestamp) ||
+    <li>URL : ${el.post.url}</li>
+        
+    <li>Scraped at : ${getLocalTime(timezone, el.post.scrapedTimestamp) ||
       el.post.index}</li>
     
-    <li>postedTimestamp : ${getLocalTime(timezone, el.post.postedTimestamp) ||
+    <li>Posted at : ${getLocalTime(timezone, el.post.postedTimestamp) ||
       el.post.index}</li>
     
-    <li>text : ${el.post.postedTimestamp || el.post.index}</li>
+    <li>Additional Text : ${el.post.text ? el.post.text : "No extra info"}</li>
     
     </ul>
     `;
-  });
+    });
 }
 console.log("printJson", printJson());
 const mailOptions = {
@@ -79,7 +80,7 @@ const mailOptions = {
   subject: "🌻 Scraped Gaffs! 🌻",
   html: `
 
-  ${printJson(["logements-a-louer-montreal", "mtl-apts"])}
+  ${printJson()}
 
     <p>–Your friends at Gaff-a-Scrape</p>
       `
@@ -94,8 +95,9 @@ const sendEmail = () => {
   });
 };
 
-sendEmail();
+cron.schedule("20 * * * *", () => {
+  console.log("Composing Email");
+  sendEmail();
 
-module.exports = {
-  sendEmail
-};
+  console.log("Done!");
+});
