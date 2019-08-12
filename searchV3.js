@@ -2,6 +2,7 @@ const { Transform } = require("stream");
 const fs = require("fs");
 const JSONStream = require("JSONStream");
 const parser = JSONStream.parse("*");
+const cron = require("node-cron");
 
 class FilterKeywords extends Transform {
   /**
@@ -51,7 +52,11 @@ function getSearchResults() {
   console.log("searched");
 }
 
-let mySearch = new FilterKeywords("MUTEK", "");
-getSearchResults();
+let mySearch = new FilterKeywords("3 1/2", "");
 
-module.exports = getSearchResults;
+cron.schedule("15 * * * *", () => {
+  console.log("searching DB");
+  getSearchResults();
+
+  console.log("Searched DB");
+});
